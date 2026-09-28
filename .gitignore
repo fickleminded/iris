@@ -1,0 +1,11 @@
+# Local swap and backup files
+*.swp
+*.bak
+*~
+.DS_Store
+
+# Agent protocol & implementation plan
+AGENTS.md
+PLAN.md
+Agents.md
+Plan.md

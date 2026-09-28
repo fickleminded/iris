@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=Iris
+Comment=Spotlight overlay and universal launcher for Omarchy
+Exec=iris toggle
+Icon=preferences-system-search
+Categories=Utility;System;
+StartupNotify=false
+Terminal=false
+NoDisplay=false
+X-Omarchy-Plugin-ID=fickleminded.iris
