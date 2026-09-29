@@ -170,6 +170,7 @@ describe("Omarchy System Commands & Actions (SystemProvider)", () => {
       assert.ok(updateResults.length > 0);
       assert.strictEqual(updateResults[0].id, "sys-update");
       assert.strictEqual(updateResults[0].command, "omarchy update");
+      assert.strictEqual(updateResults[0].terminal, true);
 
       const shareResults = SystemProvider.search("localsend", { themes: mockThemes });
       assert.ok(shareResults.length > 0);
@@ -302,6 +303,26 @@ describe("Omarchy System Commands & Actions (SystemProvider)", () => {
       SystemProvider.execute(action, mockUtil);
       assert.strictEqual(executed.length, 1);
       assert.strictEqual(executed[0], "omarchy system lock");
+    });
+
+    test("wraps terminal actions (like sys-update) in omarchy-launch-floating-terminal-with-presentation", () => {
+      const executed = [];
+      const mockUtil = {
+        execDetached(cmd) {
+          executed.push(cmd);
+          return true;
+        }
+      };
+
+      const updateAction = {
+        id: "sys-update",
+        command: "omarchy update",
+        terminal: true
+      };
+
+      SystemProvider.execute(updateAction, mockUtil);
+      assert.strictEqual(executed.length, 1);
+      assert.strictEqual(executed[0], "omarchy-launch-floating-terminal-with-presentation omarchy update");
     });
 
     test("safely ignores execution on null or missing commands", () => {

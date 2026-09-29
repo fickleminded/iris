@@ -199,10 +199,11 @@ var SYSTEM_ACTIONS = [
     description: "Update Omarchy shell and Arch packages",
     command: "omarchy update",
     icon: "󰚰",
+    terminal: true,
     keywords: ["update", "system update", "upgrade", "pacman update", "omarchy update", "check updates"],
     dangerLevel: "normal",
     isDestructive: false,
-    detailText: "Synchronizes package databases and performs rolling release system updates."
+    detailText: "Synchronizes package databases and performs rolling release system updates in a terminal window."
   },
   {
     id: "sys-share",
@@ -475,6 +476,7 @@ function search(query, context) {
           dangerLevel: act.dangerLevel,
           isDestructive: act.isDestructive,
           detailText: act.detailText,
+          terminal: !!act.terminal,
           isTopHit: score >= 85,
           hasPreview: true,
           previewType: "system",
@@ -495,7 +497,14 @@ function search(query, context) {
 // Execute the system command detached via Omarchy Util
 function execute(item, quickshellUtil) {
   if (!item || !item.command) return;
+  var cmd = item.command;
+  if (item.terminal || item.id === "sys-update") {
+    if (cmd.indexOf("omarchy-launch-floating-terminal-with-presentation") !== 0) {
+      cmd = "omarchy-launch-floating-terminal-with-presentation " + cmd;
+    }
+  }
   if (quickshellUtil && typeof quickshellUtil.execDetached === "function") {
-    quickshellUtil.execDetached(item.command);
+    quickshellUtil.execDetached(cmd);
   }
 }
+

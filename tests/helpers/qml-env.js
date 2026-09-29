@@ -34,16 +34,18 @@ function createIrisEngine() {
   const CalcProvider = loadQmlJs("js/Providers/CalcProvider.js");
   const SystemProvider = loadQmlJs("js/Providers/SystemProvider.js");
   const WebProvider = loadQmlJs("js/Providers/WebProvider.js");
+  const AiProvider = loadQmlJs("js/Providers/AiProvider.js");
 
   const Engine = loadQmlJs("js/IrisEngine.js", {
     AppProvider,
     FileProvider,
     CalcProvider,
     SystemProvider,
-    WebProvider
+    WebProvider,
+    AiProvider
   });
 
-  return { Engine, AppProvider, FileProvider, CalcProvider, SystemProvider, WebProvider };
+  return { Engine, AppProvider, FileProvider, CalcProvider, SystemProvider, WebProvider, AiProvider };
 }
 
 // Models the state and lifecycle of Iris.qml
@@ -98,6 +100,27 @@ function createIrisOverlayState(options = {}) {
       }
     },
 
+    defaultAgent: options.defaultAgent !== undefined ? options.defaultAgent : "agy",
+    aiPrompt: "",
+    aiResponseText: "",
+    aiErrorText: "",
+    aiState: "idle",
+    aiQueryGen: 0,
+
+    executeAiQuery() {
+      const prompt = state.aiPrompt.trim();
+      if (prompt.length === 0) return;
+      state.aiQueryGen += 1;
+      state.aiResponseText = "";
+      state.aiErrorText = "";
+      state.aiState = "thinking";
+    },
+
+    cancelAiQuery() {
+      state.aiQueryGen += 1;
+      state.aiState = "idle";
+    },
+
     get selectedItem() {
       return state.itemsList.length > state.selectedIndex && state.selectedIndex >= 0
         ? state.itemsList[state.selectedIndex]
@@ -123,7 +146,8 @@ function createIrisOverlayState(options = {}) {
         applications: state.desktopApplications,
         fileResults: state.fileResults,
         themes: state.installedThemes,
-        resolveIcon: (name) => name || "default-icon"
+        resolveIcon: (name) => name || "default-icon",
+        defaultAgent: state.defaultAgent
       };
       state.itemsList = Engine.search(state.filterText, ctx);
       if (state.selectedIndex >= state.itemsList.length) {
@@ -134,9 +158,26 @@ function createIrisOverlayState(options = {}) {
     setFilterText(text) {
       state.filterText = text;
       state.refreshQuery();
+
+      const parsedAi = Engine.parseAiQuery(state.filterText);
+      if (parsedAi.isAi && !parsedAi.isGuide && parsedAi.prompt.length > 0) {
+        if (parsedAi.prompt !== state.aiPrompt) {
+          state.aiPrompt = parsedAi.prompt;
+          state.cancelAiQuery();
+        }
+      } else {
+        state.aiPrompt = "";
+        state.cancelAiQuery();
+        state.aiResponseText = "";
+        state.aiErrorText = "";
+      }
     },
 
     open(payloadJson) {
+      state.cancelAiQuery();
+      state.aiPrompt = "";
+      state.aiResponseText = "";
+      state.aiErrorText = "";
       state.pickRandomPlaceholder();
       let query = "";
       if (typeof payloadJson === "string") {
@@ -164,6 +205,7 @@ function createIrisOverlayState(options = {}) {
     },
 
     close() {
+      state.cancelAiQuery();
       state.opened = false;
     },
 
@@ -210,6 +252,8 @@ function createIrisOverlayState(options = {}) {
         Engine.executeSystemAction(item, state.quickshellUtil);
       } else if (item.kind === "web") {
         Engine.openWebUrl(item, state.quickshellUtil);
+      } else if (item.kind === "ai" || item.kind === "ai-setup") {
+        Engine.launchAi(item, state.quickshellUtil);
       }
       state.dismiss();
     },
@@ -226,6 +270,10 @@ function createIrisOverlayState(options = {}) {
 
     copyCalcResult(item) {
       if (item) Engine.copyCalcResult(item, state.quickshellUtil);
+    },
+
+    copyAiResponse(text) {
+      Engine.copyAiResponse(text, state.quickshellUtil);
     },
 
     openFile(item) {

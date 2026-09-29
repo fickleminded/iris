@@ -34,14 +34,15 @@ describe("Iris Overlay Core Lifecycle & Adaptive Presentation", () => {
     test("first-time view presents discovery hints across core categories", () => {
       iris.open("{}");
 
-      // Exactly 5 discovery hints on empty launch
-      assert.strictEqual(iris.itemsList.length, 5);
+      // Exactly 6 discovery hints on empty launch (Apps, Files, Calc, AI, Web, System)
+      assert.strictEqual(iris.itemsList.length, 6);
 
       const categories = Array.from(iris.itemsList.map(item => item.category));
       assert.deepStrictEqual(categories, [
         "Applications",
         "Files & Folders",
         "Calculator",
+        "AI Agent",
         "Web Search",
         "System Actions"
       ]);
@@ -68,8 +69,8 @@ describe("Iris Overlay Core Lifecycle & Adaptive Presentation", () => {
       assert.strictEqual(iris.selectedIndex, 1);
       assert.strictEqual(iris.selectedItem.id, "hint-files");
 
-      iris.select(3);
-      assert.strictEqual(iris.selectedIndex, 4);
+      iris.select(4);
+      assert.strictEqual(iris.selectedIndex, 5);
       assert.strictEqual(iris.selectedItem.id, "hint-system");
 
       // Wrap around to top
@@ -78,7 +79,7 @@ describe("Iris Overlay Core Lifecycle & Adaptive Presentation", () => {
 
       // Wrap around backwards to bottom
       iris.select(-1);
-      assert.strictEqual(iris.selectedIndex, 4);
+      assert.strictEqual(iris.selectedIndex, 5);
     });
 
     test("activating a hint populates actionable query template", () => {
@@ -176,6 +177,18 @@ describe("Iris Overlay Core Lifecycle & Adaptive Presentation", () => {
       assert.strictEqual(iris.selectedItem.category, "Web");
       assert.strictEqual(iris.selectedItem.hasPreview, true);
       assert.strictEqual(iris.selectedItem.previewType, "web");
+      assert.strictEqual(iris.currentCardWidth, 920);
+    });
+
+    test("AI agent query adapts to two-pane mode with AI preview", () => {
+      iris.open("{}");
+
+      iris.setFilterText("ai explain quickshell");
+
+      assert.ok(iris.itemsList.length > 0);
+      assert.strictEqual(iris.selectedItem.category, "AI Agent");
+      assert.strictEqual(iris.selectedItem.hasPreview, true);
+      assert.strictEqual(iris.selectedItem.previewType, "ai");
       assert.strictEqual(iris.currentCardWidth, 920);
     });
   });

@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "fickleminded.iris",
   "name": "Iris",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "author": "Tirthankar Bhattacharjee",
   "license": "MIT",
   "description": "A fast, elegant, keyboard-driven universal search overlay and quick launcher for Omarchy Quattro with Quickshell and Hyprland.",

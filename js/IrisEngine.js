@@ -4,11 +4,12 @@
 .import "Providers/CalcProvider.js" as CalcProvider
 .import "Providers/SystemProvider.js" as SystemProvider
 .import "Providers/WebProvider.js" as WebProvider
+.import "Providers/AiProvider.js" as AiProvider
 
 // Iris Engine: Central dispatcher and provider coordinator
-// Coordinates AppProvider, FileProvider, CalcProvider, SystemProvider, and WebProvider.
+// Coordinates AppProvider, FileProvider, CalcProvider, SystemProvider, WebProvider, and AiProvider.
 
-var VERSION = "1.0.0";
+var VERSION = "1.1.0";
 var MAX_RESULTS = 50;
 
 // Format byte sizes into human readable strings (B, KB, MB, GB)
@@ -76,6 +77,17 @@ function search(text, context) {
         fillQuery: "50 f to c"
       },
       {
+        id: "hint-ai",
+        kind: "hint",
+        category: "AI Agent",
+        name: "AI Agent Prompting",
+        description: "Prompt default agent: 'ai <question>' or '? <prompt>' with live response",
+        icon: "󰚩",
+        hasPreview: false,
+        action: "hint",
+        fillQuery: "ai "
+      },
+      {
         id: "hint-web",
         kind: "hint",
         category: "Web Search",
@@ -99,6 +111,14 @@ function search(text, context) {
       }
     ];
   } else {
+    // 0. AI Agent Mode Search (ai <prompt> or ? <prompt>)
+    if (AiProvider.isAiQuery(q)) {
+      var aiMatches = AiProvider.search(q, context);
+      if (aiMatches.length > 0) {
+        return aiMatches;
+      }
+    }
+
     // 1. Calculator & Unit Conversion Search (Instant calculation as you type)
     var calcHit = CalcProvider.evaluate(q);
     if (calcHit) {
@@ -201,6 +221,26 @@ function executeSystemAction(item, quickshellUtil) {
 
 function openWebUrl(item, quickshellUtil) {
   return WebProvider.openUrl(item && item.url, quickshellUtil);
+}
+
+function launchAi(item, quickshellUtil) {
+  return AiProvider.launchInteractive(item, quickshellUtil);
+}
+
+function copyAiResponse(text, quickshellUtil) {
+  return AiProvider.copyResponse(text, quickshellUtil);
+}
+
+function isAiQuery(query) {
+  return AiProvider.isAiQuery(query);
+}
+
+function parseAiQuery(query) {
+  return AiProvider.parseQuery(query);
+}
+
+function buildAiInlineArgs(prompt) {
+  return AiProvider.buildInlineArgs(prompt);
 }
 
 

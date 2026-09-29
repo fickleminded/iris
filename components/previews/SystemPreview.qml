@@ -246,7 +246,7 @@ Item {
         }
 
         Text {
-          text: root.isDanger ? "Press Enter to Confirm" : (root.item && root.item.category === "Theme" ? "Press Enter to Apply Theme" : (root.item && root.item.id === "sys-theme-bg-switcher" ? "Press Enter to Open Wallpaper Picker" : "Press Enter to Execute"))
+          text: root.isDanger ? "Press Enter to Confirm" : (root.item && root.item.category === "Theme" ? "Press Enter to Apply Theme" : (root.item && root.item.id === "sys-theme-bg-switcher" ? "Press Enter to Open Wallpaper Picker" : (root.item && (root.item.terminal || root.item.id === "sys-update") ? "Press Enter to Run in Terminal" : "Press Enter to Execute")))
           font.family: root.fontFamily
           font.pixelSize: Style.font.body
           font.bold: true

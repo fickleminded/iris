@@ -56,6 +56,14 @@ Bringing the beloved Spotlight and Raycast overlay paradigm natively to Hyprland
   - Open Omarchy Wallpaper Picker (`wallpaper`).
   - Inspect and sync active color palettes (`theme`).
 
+- 🤖 **Omarchy AI Coding Agent Mode**:
+  - Ask questions directly from your keyboard using `ai <prompt>` or `? <prompt>`.
+  - Live asynchronous token streaming inside Iris with markdown rendering (`Text.MarkdownText`).
+  - Seamlessly adapts to your active default agent (`Antigravity`, `Claude Code`, `Gemini`, `OpenCode`, `Codex`, etc.).
+  - Press `Enter` to hand off the prompt session directly into the floating Omarchy agent TUI (`omarchy agent prompt "<prompt>"`).
+  - Press `Ctrl+C` or `Ctrl+Y` to copy the generated markdown response to the clipboard.
+  - Zero-config onboarding: If no default agent is selected, pressing `Enter` summons the native agent picker.
+
 - 🎨 **Native Omarchy Theming**:
   - Inherits system theme tokens and accent colors automatically (`Color.menu.*`, `Style.*`).
   - Fullscreen Wayland dimming scrim with smooth opacity transitions.
@@ -109,9 +117,11 @@ omarchy plugin remove fickleminded.iris
 | `ALT + SPACE` | Global | Toggle Iris overlay summon / dismiss |
 | `↑` / `↓` | Results List | Navigate search results |
 | `Enter` | Any Result | Execute primary action (Launch app, open file, copy result) |
+| `Enter` | AI Prompt | Hand off session to interactive terminal (`omarchy agent prompt`) |
 | `Tab` / `Ctrl + O` | File Result | Reveal and select in File Manager (`nautilus`) |
 | `Ctrl + T` | File Result | Open containing folder in Terminal |
-| `Ctrl + C` / `Ctrl + Y` | File / Calc | Copy path or calculated result to clipboard |
+| `Ctrl + C` / `Ctrl + Y` | File / Calc / AI | Copy path, calc result, or streamed AI answer to clipboard |
+| `Esc` | Streaming AI | Cancel active background AI response generation |
 | `Esc` | Overlay Active | Clear current search query (or dismiss overlay if empty) |
 
 ---
@@ -157,9 +167,7 @@ To run the automated test suite locally:
 
 ## 🔮 Roadmap & Future Improvements
 
-We have exciting plans to expand Iris into a comprehensive, extensible desktop command hub for Omarchy:
-
-- [ ] 🤖 **AI Prompt with Default Agent**: Inline AI queries (`ai <prompt>` or `? <prompt>`) that pipe directly to the configured Omarchy default AI agent with instant previews.
+- [x] 🤖 **AI Prompt with Default Agent**: Inline AI queries (ai <prompt> or ? <prompt>) that pipe directly to the configured Omarchy default AI agent with instant previews.
 - [ ] ⏰ **Omarchy Reminders & Timers**: Natural language quick reminders (e.g., `remind in 15m review PR`, `timer 5m`) integrated with desktop notifications.
 - [ ] 🧩 **Plugin Management Shortcuts**: Quick lookup, inspection, and toggling of Omarchy plugins (`plugin list`, `plugin enable <name>`, `plugin update`).
 - [ ] 📦 **Package Search & Installation**: Fast Arch Linux (`pacman`) and AUR package search with one-click terminal install triggers (`install <package>`, `pkg <query>`).

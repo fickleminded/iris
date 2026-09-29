@@ -191,13 +191,111 @@ Item {
     return Quickshell.iconPath("application-x-executable", true)
   }
 
+  // AI Agent Streaming Process & State (Phase 7)
+  property string defaultAgent: ""
+  property string aiPrompt: ""
+  property string aiResponseText: ""
+  property string aiErrorText: ""
+  property string aiState: "idle" // "idle", "thinking", "streaming", "completed", "error"
+  property int aiQueryGen: 0
+
+  FileView {
+    id: defaultAgentFile
+    path: root.homeDir + "/.config/omarchy/defaults/agent"
+    watchChanges: true
+    printErrors: false
+    onLoaded: {
+      var val = String(text() || "").trim()
+      root.defaultAgent = val
+    }
+    onFileChanged: {
+      var val = String(text() || "").trim()
+      root.defaultAgent = val
+      root.refreshQuery()
+    }
+  }
+
+  Timer {
+    id: aiDebounceTimer
+    interval: 600
+    repeat: false
+    onTriggered: root.executeAiQuery()
+  }
+
+  Process {
+    id: aiProcess
+    property int activeGen: 0
+    stdout: SplitParser {
+      onRead: function(line) {
+        if (aiProcess.activeGen === root.aiQueryGen) {
+          if (root.aiState !== "streaming") {
+            root.aiState = "streaming"
+          }
+          root.aiResponseText = (root.aiResponseText.length > 0 ? root.aiResponseText + "\n" : "") + line
+        }
+      }
+    }
+    stderr: SplitParser {
+      onRead: function(line) {
+        if (aiProcess.activeGen === root.aiQueryGen) {
+          root.aiErrorText = (root.aiErrorText.length > 0 ? root.aiErrorText + "\n" : "") + line
+        }
+      }
+    }
+    onExited: function(exitCode) {
+      if (aiProcess.activeGen === root.aiQueryGen) {
+        if (exitCode === 0) {
+          root.aiState = "completed"
+        } else {
+          if (root.aiState !== "idle") {
+            root.aiState = "error"
+            if (root.aiErrorText.length === 0) {
+              root.aiErrorText = "Process exited with code " + exitCode
+            }
+          }
+        }
+      }
+    }
+  }
+
+  function executeAiQuery() {
+    var prompt = root.aiPrompt.trim()
+    if (prompt.length === 0) return
+    if (!root.defaultAgent || root.defaultAgent.length === 0) {
+      root.aiState = "idle"
+      return
+    }
+
+    aiDebounceTimer.stop()
+    if (aiProcess.running) {
+      aiProcess.running = false
+    }
+    root.aiQueryGen += 1
+    aiProcess.activeGen = root.aiQueryGen
+    root.aiResponseText = ""
+    root.aiErrorText = ""
+    root.aiState = "thinking"
+    aiProcess.command = Engine.buildAiInlineArgs(prompt)
+    aiProcess.running = true
+  }
+
+  function cancelAiQuery() {
+    aiDebounceTimer.stop()
+    root.aiQueryGen += 1
+    if (aiProcess.running) {
+      aiProcess.running = false
+    }
+    root.aiState = "idle"
+  }
+
   function refreshQuery() {
     var ctx = {
       applications: root.desktopApplications,
       fileResults: root.fileResults,
       themes: root.installedThemes,
       shell: root.shell,
-      resolveIcon: root.resolveIcon
+      resolveIcon: root.resolveIcon,
+      defaultAgent: root.defaultAgent
     }
     root.itemsList = Engine.search(root.filterText, ctx)
     if (root.selectedIndex >= root.itemsList.length) {
@@ -213,6 +311,20 @@ Item {
     } else {
       fileSearchTimer.restart()
     }
+
+    var parsedAi = Engine.parseAiQuery(root.filterText)
+    if (parsedAi.isAi && !parsedAi.isGuide && parsedAi.prompt.length > 0) {
+      if (parsedAi.prompt !== root.aiPrompt) {
+        root.aiPrompt = parsedAi.prompt
+        root.cancelAiQuery()
+        aiDebounceTimer.restart()
+      }
+    } else {
+      root.aiPrompt = ""
+      root.cancelAiQuery()
+      root.aiResponseText = ""
+      root.aiErrorText = ""
+    }
   }
   onDesktopApplicationsChanged: root.refreshQuery()
   onOpenedChanged: {
@@ -224,6 +336,10 @@ Item {
   }
 
   function open(payloadJson) {
+    root.cancelAiQuery()
+    root.aiPrompt = ""
+    root.aiResponseText = ""
+    root.aiErrorText = ""
     root.pickRandomPlaceholder()
     var query = ""
     if (typeof payloadJson === "string") {
@@ -254,6 +370,7 @@ Item {
   }
 
   function close() {
+    root.cancelAiQuery()
     root.opened = false
   }
 
@@ -296,6 +413,8 @@ Item {
       Engine.executeSystemAction(item, Util)
     } else if (item.kind === "web") {
       Engine.openWebUrl(item, Util)
+    } else if (item.kind === "ai" || item.kind === "ai-setup") {
+      Engine.launchAi(item, Util)
     }
     root.dismiss()
   }
@@ -360,7 +479,9 @@ Item {
         Keys.priority: Keys.BeforeItem
         Keys.onPressed: function(event) {
           if (event.key === Qt.Key_Escape) {
-            if (root.filterText && root.filterText.length > 0) {
+            if (root.aiState === "streaming" || root.aiState === "thinking") {
+              root.cancelAiQuery()
+            } else if (root.filterText && root.filterText.length > 0) {
               root.filterText = ""
             } else {
               root.dismiss()
@@ -396,11 +517,13 @@ Item {
               root.dismiss()
             }
             event.accepted = true
-          } else if ((event.modifiers & Qt.ControlModifier) && event.key === Qt.Key_C) {
+          } else if ((event.modifiers & Qt.ControlModifier) && (event.key === Qt.Key_C || event.key === Qt.Key_Y)) {
             if (root.selectedItem && root.selectedItem.kind === "file") {
               Engine.copyPath(root.selectedItem, Util)
             } else if (root.selectedItem && root.selectedItem.kind === "calc") {
               Engine.copyCalcResult(root.selectedItem, Util)
+            } else if (root.selectedItem && (root.selectedItem.kind === "ai" || root.selectedItem.kind === "ai-setup")) {
+              Engine.copyAiResponse(root.aiResponseText, Util)
             }
             event.accepted = true
           } else if (((event.modifiers & Qt.ControlModifier) && (event.key === Qt.Key_V || event.text === "v" || event.text === "V" || event.text === "\u0016")) ||
@@ -554,7 +677,7 @@ Item {
           Row {
             id: bodyBox
             width: parent.width
-            height: Math.min(Style.space(340), Math.max(Style.space(160), root.itemsList.length * root.rowHeight))
+            height: root.hasPreview ? Style.space(340) : Math.min(Style.space(340), Math.max(Style.space(160), root.itemsList.length * root.rowHeight))
             spacing: Style.spacing.md
 
             // Left Pane: Results List
@@ -826,9 +949,28 @@ Item {
                 onOpenRequested: root.activateItem(root.selectedItem)
               }
 
-              // 6. Generic / Demo Preview Fallback
+              // 6. AI Agent Preview (Phase 7)
+              Previews.AiPreview {
+                visible: Boolean(root.selectedItem && root.selectedItem.previewType === "ai")
+                anchors.fill: parent
+                item: root.selectedItem
+                aiPrompt: root.aiPrompt
+                aiResponseText: root.aiResponseText
+                aiErrorText: root.aiErrorText
+                aiState: root.aiState
+                fontFamily: root.fontFamily
+                foreground: root.foreground
+                accent: root.accent
+                border: root.border
+                cornerRadius: root.cornerRadius
+                onLaunchRequested: root.activateItem(root.selectedItem)
+                onCopyRequested: Engine.copyAiResponse(root.aiResponseText, Util)
+                onCancelRequested: root.cancelAiQuery()
+              }
+
+              // 7. Generic / Demo Preview Fallback
               Column {
-                visible: Boolean(!root.selectedItem || (root.selectedItem.previewType !== "app" && root.selectedItem.previewType !== "file" && root.selectedItem.previewType !== "calc" && root.selectedItem.previewType !== "system" && root.selectedItem.previewType !== "web"))
+                visible: Boolean(!root.selectedItem || (root.selectedItem.previewType !== "app" && root.selectedItem.previewType !== "file" && root.selectedItem.previewType !== "calc" && root.selectedItem.previewType !== "system" && root.selectedItem.previewType !== "web" && root.selectedItem.previewType !== "ai"))
                 anchors.fill: parent
                 anchors.margins: Style.spacing.sm
                 spacing: Style.spacing.sm
