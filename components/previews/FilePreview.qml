@@ -81,6 +81,7 @@ Item {
 
           Text {
             text: root.item && root.item.name ? root.item.name : ""
+            textFormat: Text.PlainText
             font.family: root.fontFamily
             font.pixelSize: Style.font.subtitle
             font.bold: true
@@ -111,6 +112,7 @@ Item {
         Text {
           width: parent.width
           text: root.item && root.item.path ? root.item.path : ""
+          textFormat: Text.PlainText
           font.family: root.fontFamily
           font.pixelSize: Math.max(10, Style.font.caption)
           color: root.foreground
@@ -189,6 +191,7 @@ Item {
           Text {
             id: codeDisplay
             text: root.fileSnippet.length > 0 ? root.fileSnippet : "Loading preview..."
+            textFormat: Text.PlainText
             font.family: Style.font.monospaceFamily || "monospace"
             font.pixelSize: Math.max(10, Style.font.caption)
             color: root.foreground

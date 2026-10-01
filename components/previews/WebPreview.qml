@@ -57,6 +57,7 @@ Item {
 
           Text {
             text: root.item && root.item.engineName ? root.item.engineName : "Web Search"
+            textFormat: Text.PlainText
             font.family: root.fontFamily
             font.pixelSize: Style.font.title
             font.bold: true
@@ -176,6 +177,7 @@ Item {
             Text {
               width: parent.width - Style.space(20)
               text: root.item && root.item.url ? root.item.url : ""
+              textFormat: Text.PlainText
               font.family: Style.font.monoFamily || "monospace"
               font.pixelSize: Math.max(9, Style.font.caption - 1)
               color: root.foreground

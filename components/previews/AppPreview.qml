@@ -69,6 +69,7 @@ Item {
 
           Text {
             text: root.item && root.item.name ? root.item.name : ""
+            textFormat: Text.PlainText
             font.family: root.fontFamily
             font.pixelSize: Style.font.title
             font.bold: true
@@ -101,6 +102,7 @@ Item {
         Text {
           width: parent.width
           text: root.item && root.item.description ? root.item.description : "Desktop Application"
+          textFormat: Text.PlainText
           font.family: root.fontFamily
           font.pixelSize: Style.font.body
           color: root.foreground
@@ -132,6 +134,7 @@ Item {
           visible: Boolean(root.item && root.item.comment && root.item.comment.length > 0 && root.item.comment !== root.item.description)
           width: parent.width
           text: root.item && root.item.comment ? root.item.comment : ""
+          textFormat: Text.PlainText
           font.family: root.fontFamily
           font.pixelSize: Style.font.body
           color: root.foreground
