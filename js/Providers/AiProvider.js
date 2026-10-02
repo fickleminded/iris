@@ -376,3 +376,37 @@ function copyResponse(text, quickshellUtil) {
   }
 }
 
+// Sanitize assistant markdown text to prevent shell-initiated remote image loading:
+// Covers inline images, reference-style images (full, collapsed, shortcut),
+// and HTML media/image tags.
+function sanitizeMarkdown(src) {
+  if (src === null || src === undefined) return "";
+  var out = String(src);
+
+  // 1. Strip container media blocks (svg, picture, video, audio, object, iframe) and their contents
+  out = out.replace(/<(?:picture|svg|video|audio|object|iframe)\b[\s\S]*?<\/(?:picture|svg|video|audio|object|iframe)>/gi, "");
+
+  // 2. Strip standalone/void media and image tags (img, embed, source)
+  out = out.replace(/<\/?(?:img|embed|source)\b[\s\S]*?>/gi, "");
+
+  // 3. Strip any remaining HTML tag containing an image/media src, srcset, or background attribute
+  out = out.replace(/<[a-z][a-z0-9]*\b[^>]*?\b(?:src|srcset|background)\s*=[\s\S]*?>/gi, "");
+
+  // 4. Neutralize all Markdown image forms:
+  //    - Inline images: ![alt](url "title")
+  //    - Full reference images: ![alt][ref]
+  //    - Collapsed reference images: ![ref][]
+  //    - Shortcut reference images: ![ref]
+  // Matches "!" followed by link text in [...], then optionally followed by
+  // (url) or [ref] on the same line or next line without an intervening blank line.
+  out = out.replace(/!\[([^\]]*)\](?:\s*\((?:[^()]*|\([^()]*\))*\)|[ \t]*(?:\r?\n[ \t]*)?\[([^\]]*)\])?/g, function(match, alt, ref) {
+    var label = String(alt || ref || "").trim();
+    return label ? "[image: " + label + "]" : "[image]";
+  });
+
+  // 4. Neutralize any remaining "![" markers (e.g. malformed or unclosed image syntax)
+  out = out.replace(/!\[/g, "[image: ");
+
+  return out;
+}
+

@@ -459,6 +459,60 @@ describe("Iris AI Agent Provider (AiProvider)", () => {
       assert.strictEqual(overlay.launchedCommands[0], "omarchy-menu summon setup.default.agent");
     });
   });
+
+  describe("10. Assistant Markdown Sanitization & Remote Resource Prevention", () => {
+    test("neutralizes reference-style images (HANCORE marketplace review case)", () => {
+      const input = "![x][r]\n[r]: https://example.com/image.png";
+      const sanitized = AiProvider.sanitizeMarkdown(input);
+
+      assert.strictEqual(sanitized, "[image: x]\n[r]: https://example.com/image.png");
+      assert.ok(!sanitized.includes("!["), "Must not contain any markdown image tokens");
+    });
+
+    test("neutralizes inline images with and without title", () => {
+      const input1 = "Look at this: ![cute cat](https://example.com/cat.png)";
+      assert.strictEqual(AiProvider.sanitizeMarkdown(input1), "Look at this: [image: cute cat]");
+
+      const input2 = "Look at this: ![cute cat](https://example.com/cat.png \"A Cat\")";
+      assert.strictEqual(AiProvider.sanitizeMarkdown(input2), "Look at this: [image: cute cat]");
+    });
+
+    test("neutralizes collapsed and shortcut reference images", () => {
+      const collapsed = "Image here: ![photo][]\n\n[photo]: https://example.com/photo.jpg";
+      assert.strictEqual(AiProvider.sanitizeMarkdown(collapsed), "Image here: [image: photo]\n\n[photo]: https://example.com/photo.jpg");
+
+      const shortcut = "Image here: ![diagram]\n\n[diagram]: https://example.com/diag.svg";
+      assert.strictEqual(AiProvider.sanitizeMarkdown(shortcut), "Image here: [image: diagram]\n\n[diagram]: https://example.com/diag.svg");
+    });
+
+    test("strips HTML image and media tags including multiline tags", () => {
+      const html1 = "Text before <img src=\"https://evil.com/track.png\" /> text after";
+      assert.strictEqual(AiProvider.sanitizeMarkdown(html1), "Text before  text after");
+
+      const html2 = "Text before <img\n  src=\"https://evil.com/track.png\"\n  width=\"100\"\n> text after";
+      assert.strictEqual(AiProvider.sanitizeMarkdown(html2), "Text before  text after");
+
+      const picture = "<picture><source srcset=\"pic.webp\"><img src=\"pic.jpg\"></picture>";
+      assert.strictEqual(AiProvider.sanitizeMarkdown(picture), "");
+
+      const svg = "Before <svg width=\"100\"><circle r=\"10\"/></svg> After";
+      assert.strictEqual(AiProvider.sanitizeMarkdown(svg), "Before  After");
+    });
+
+    test("preserves legitimate markdown links, code blocks, and math", () => {
+      const links = "Check [Omarchy Docs](https://omarchy.org) and [repo][r]\n\n[r]: https://github.com";
+      assert.strictEqual(AiProvider.sanitizeMarkdown(links), links);
+
+      const math = "Factorial: 5! = 120 and array index [0]";
+      assert.strictEqual(AiProvider.sanitizeMarkdown(math), math);
+
+      const empty = AiProvider.sanitizeMarkdown("");
+      assert.strictEqual(empty, "");
+
+      const nil = AiProvider.sanitizeMarkdown(null);
+      assert.strictEqual(nil, "");
+    });
+  });
 });
 
 

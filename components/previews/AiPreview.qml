@@ -55,9 +55,31 @@ Item {
 
   function sanitizeMarkdown(src) {
     if (!src) return ""
-    // Neutralize markdown images ![alt](url) and HTML img tags to prevent any outbound network requests
-    return src.replace(/!\[([^\]]*)\]\([^)]*\)/g, "[image: $1]")
-              .replace(/<img[^>]*>/gi, "")
+    var out = String(src)
+
+    // 1. Strip container media blocks (svg, picture, video, audio, object, iframe) and their contents
+    out = out.replace(/<(?:picture|svg|video|audio|object|iframe)\b[\s\S]*?<\/(?:picture|svg|video|audio|object|iframe)>/gi, "")
+
+    // 2. Strip standalone/void media and image tags (img, embed, source)
+    out = out.replace(/<\/?(?:img|embed|source)\b[\s\S]*?>/gi, "")
+
+    // 3. Strip any remaining HTML tag containing an image/media src, srcset, or background attribute
+    out = out.replace(/<[a-z][a-z0-9]*\b[^>]*?\b(?:src|srcset|background)\s*=[\s\S]*?>/gi, "")
+
+    // 4. Neutralize all Markdown image forms:
+    //    - Inline images: ![alt](url "title")
+    //    - Full reference images: ![alt][ref]
+    //    - Collapsed reference images: ![ref][]
+    //    - Shortcut reference images: ![ref]
+    out = out.replace(/!\[([^\]]*)\](?:\s*\((?:[^()]*|\([^()]*\))*\)|[ \t]*(?:\r?\n[ \t]*)?\[([^\]]*)\])?/g, function(match, alt, ref) {
+      var label = String(alt || ref || "").trim()
+      return label ? "[image: " + label + "]" : "[image]"
+    })
+
+    // 4. Neutralize any remaining "![" markers (e.g. malformed or unclosed image syntax)
+    out = out.replace(/!\[/g, "[image: ")
+
+    return out
   }
 
   Column {

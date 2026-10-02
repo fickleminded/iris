@@ -9,7 +9,7 @@
 // Iris Engine: Central dispatcher and provider coordinator
 // Coordinates AppProvider, FileProvider, CalcProvider, SystemProvider, WebProvider, and AiProvider.
 
-var VERSION = "1.3.0";
+var VERSION = "1.3.1";
 var MAX_RESULTS = 50;
 
 // Format byte sizes into human readable strings (B, KB, MB, GB)
