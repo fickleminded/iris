@@ -1,9 +1,11 @@
 [Desktop Entry]
 Type=Application
 Name=Iris
-Comment=Spotlight overlay and universal launcher for Omarchy
+GenericName=Universal Search Overlay & Quick Launcher
+Comment=A fast, elegant, keyboard-driven universal search overlay and quick launcher for Omarchy Quattro with Quickshell and Hyprland.
 Exec=iris toggle
-Icon=preferences-system-search
+Icon=iris
+Keywords=spotlight;launcher;search;calculator;units;files;agents;ai;convert;
 Categories=Utility;System;
 StartupNotify=false
 Terminal=false

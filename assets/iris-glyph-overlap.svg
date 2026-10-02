@@ -1,0 +1,36 @@
+<svg style="color: white;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <mask id="tom-gleam">
+      <rect width="512" height="512" fill="white" />
+      <ellipse cx="276" cy="234" rx="18" ry="14" transform="rotate(-25 276 234)" fill="black" />
+      <circle cx="294" cy="252" r="6.5" fill="black" />
+    </mask>
+
+    <mask id="tom-petals">
+      <rect width="512" height="512" fill="white" />
+      <circle cx="256" cy="256" r="79" fill="black" />
+      <circle cx="256.00" cy="168.00" r="106" fill="none" stroke="black" stroke-width="7" />
+      <circle cx="332.21" cy="212.00" r="106" fill="none" stroke="black" stroke-width="7" />
+      <circle cx="332.21" cy="300.00" r="106" fill="none" stroke="black" stroke-width="7" />
+      <circle cx="256.00" cy="344.00" r="106" fill="none" stroke="black" stroke-width="7" />
+      <circle cx="179.79" cy="300.00" r="106" fill="none" stroke="black" stroke-width="7" />
+      <circle cx="179.79" cy="212.00" r="106" fill="none" stroke="black" stroke-width="7" />
+    </mask>
+  </defs>
+
+  <!-- Outer Ring -->
+  <circle cx="256" cy="256" r="232" fill="none" stroke="currentColor" stroke-width="18" />
+
+  <!-- Overlapping Petals (Solid with negative-space overlap contours) -->
+  <g mask="url(#tom-petals)" fill="currentColor">
+    <circle cx="256.00" cy="168.00" r="106" />
+    <circle cx="332.21" cy="212.00" r="106" />
+    <circle cx="332.21" cy="300.00" r="106" />
+    <circle cx="256.00" cy="344.00" r="106" />
+    <circle cx="179.79" cy="300.00" r="106" />
+    <circle cx="179.79" cy="212.00" r="106" />
+  </g>
+
+  <!-- Central Pupil with Specular Gleam -->
+  <circle cx="256" cy="256" r="72" fill="currentColor" mask="url(#tom-gleam)" />
+</svg>

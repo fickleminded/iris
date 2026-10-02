@@ -183,6 +183,9 @@ Item {
     if (value.length === 0) return Quickshell.iconPath("application-x-executable", true)
     if (value.indexOf("file://") === 0 || value.indexOf("image://") === 0) return value
     if (value.charAt(0) === "/") return Util.fileUrl(value)
+    if (value === "iris" || value === "fickleminded.iris") {
+      return Qt.resolvedUrl("assets/iris-logo.png")
+    }
     if (root.shell && root.shell.appLibrary && typeof root.shell.appLibrary.iconSource === "function") {
       return root.shell.appLibrary.iconSource(value)
     }
@@ -652,23 +655,41 @@ Item {
               }
             }
 
-            // Iris Badge
+            // Iris Badge with Rosette Glyph
             Rectangle {
               id: headerBadge
               anchors.verticalCenter: parent.verticalCenter
-              width: badgeText.implicitWidth + Style.spacing.sm * 2
+              width: badgeRow.implicitWidth + Style.spacing.sm * 2
               height: Style.space(22)
               radius: Style.space(4)
               color: Util.alpha(root.accent, 0.18)
 
-              Text {
-                id: badgeText
+              Row {
+                id: badgeRow
                 anchors.centerIn: parent
-                text: "Iris"
-                font.family: root.fontFamily
-                font.pixelSize: Math.max(10, Style.font.caption)
-                font.bold: true
-                color: root.accent
+                spacing: Style.space(6)
+
+                Image {
+                  id: badgeIcon
+                  anchors.verticalCenter: parent.verticalCenter
+                  width: Style.space(14)
+                  height: Style.space(14)
+                  source: Qt.resolvedUrl("assets/iris-glyph-rosette.svg")
+                  sourceSize.width: Style.space(28)
+                  sourceSize.height: Style.space(28)
+                  fillMode: Image.PreserveAspectFit
+                }
+
+                Text {
+                  id: badgeText
+                  anchors.verticalCenter: parent.verticalCenter
+                  text: "Iris"
+                  textFormat: Text.PlainText
+                  font.family: root.fontFamily
+                  font.pixelSize: Math.max(10, Style.font.caption)
+                  font.bold: true
+                  color: root.accent
+                }
               }
             }
           }
@@ -987,6 +1008,7 @@ Item {
                     anchors.verticalCenter: parent.verticalCenter
                     Text {
                       text: root.selectedItem ? root.selectedItem.name : "Preview"
+                      textFormat: Text.PlainText
                       font.family: root.fontFamily
                       font.pixelSize: Style.font.subtitle
                       font.bold: true
@@ -994,6 +1016,7 @@ Item {
                     }
                     Text {
                       text: root.selectedItem ? root.selectedItem.category : ""
+                      textFormat: Text.PlainText
                       font.family: root.fontFamily
                       font.pixelSize: Style.font.caption
                       color: root.foreground
@@ -1012,6 +1035,7 @@ Item {
                 Text {
                   width: parent.width
                   text: root.selectedItem ? root.selectedItem.description : ""
+                  textFormat: Text.PlainText
                   font.family: root.fontFamily
                   font.pixelSize: Style.font.body
                   color: root.foreground

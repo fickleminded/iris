@@ -222,6 +222,7 @@ Item {
           Text {
             anchors.horizontalCenter: parent.horizontalCenter
             text: root.isFolder ? "Directory Folder" : (root.item && root.item.extension ? (root.item.extension.toUpperCase() + " File") : "File")
+            textFormat: Text.PlainText
             font.family: root.fontFamily
             font.pixelSize: Style.font.body
             font.bold: true
@@ -231,6 +232,7 @@ Item {
           Text {
             anchors.horizontalCenter: parent.horizontalCenter
             text: root.item ? root.item.description : ""
+            textFormat: Text.PlainText
             font.family: root.fontFamily
             font.pixelSize: Style.font.caption
             color: root.foreground

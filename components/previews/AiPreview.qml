@@ -53,6 +53,13 @@ Item {
     return Util.alpha(root.foreground, 0.45)
   }
 
+  function sanitizeMarkdown(src) {
+    if (!src) return ""
+    // Neutralize markdown images ![alt](url) and HTML img tags to prevent any outbound network requests
+    return src.replace(/!\[([^\]]*)\]\([^)]*\)/g, "[image: $1]")
+              .replace(/<img[^>]*>/gi, "")
+  }
+
   Column {
     anchors.fill: parent
     anchors.margins: Style.spacing.md
@@ -225,6 +232,7 @@ Item {
           text: root.effectivePrompt.length > 0
             ? root.effectivePrompt
             : ("Ask " + root.agentName + " anything with 'ai <prompt>' or '? <prompt>'...")
+          textFormat: Text.PlainText
           font.family: root.fontFamily
           font.pixelSize: Math.max(9, Style.font.caption)
           font.italic: root.effectivePrompt.length === 0
@@ -391,6 +399,7 @@ Item {
           anchors.horizontalCenter: parent.horizontalCenter
           width: parent.width
           text: root.aiErrorText.length > 0 ? root.aiErrorText : "The agent process exited with an error."
+          textFormat: Text.PlainText
           font.family: Style.font.monoFamily || "monospace"
           font.pixelSize: Math.max(9, Style.font.caption)
           color: root.foreground
@@ -421,7 +430,7 @@ Item {
           Text {
             id: responseMarkdown
             width: parent.width
-            text: root.aiResponseText
+            text: root.sanitizeMarkdown(root.aiResponseText)
             textFormat: Text.MarkdownText
             wrapMode: Text.Wrap
             font.family: root.fontFamily

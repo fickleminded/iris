@@ -80,6 +80,7 @@ Item {
               id: badgeText
               anchors.centerIn: parent
               text: root.item && root.item.badge ? root.item.badge : ""
+              textFormat: Text.PlainText
               font.family: root.fontFamily
               font.pixelSize: Math.max(8, Style.font.caption - 2)
               font.bold: true
@@ -111,6 +112,7 @@ Item {
         Text {
           width: parent.width
           text: root.item && root.item.description ? root.item.description : ""
+          textFormat: Text.PlainText
           font.family: root.fontFamily
           font.pixelSize: Style.font.body
           color: root.foreground

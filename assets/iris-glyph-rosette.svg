@@ -1,0 +1,30 @@
+<svg style="color: white;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <mask id="v2g-gleam">
+      <rect width="512" height="512" fill="white" />
+      <ellipse cx="274" cy="236" rx="16" ry="13" transform="rotate(-25 274 236)" fill="black" />
+      <circle cx="290" cy="252" r="6" fill="black" />
+    </mask>
+
+    <mask id="v2g-petalMask">
+      <rect width="512" height="512" fill="white" />
+      <circle cx="256" cy="256" r="74" fill="black" />
+    </mask>
+  </defs>
+
+  <!-- Outer Ring -->
+  <circle cx="256" cy="256" r="232" fill="none" stroke="currentColor" stroke-width="18" />
+
+  <!-- Petals with clear outer gap and inner pupil gap -->
+  <g mask="url(#v2g-petalMask)" fill="currentColor" fill-opacity="0.25" stroke="currentColor" stroke-width="9">
+    <circle cx="256.00" cy="172.00" r="98" />
+    <circle cx="328.75" cy="214.00" r="98" />
+    <circle cx="328.75" cy="298.00" r="98" />
+    <circle cx="256.00" cy="340.00" r="98" />
+    <circle cx="183.25" cy="298.00" r="98" />
+    <circle cx="183.25" cy="214.00" r="98" />
+  </g>
+
+  <!-- Central Pupil (clean transparent negative-space highlight) -->
+  <circle cx="256" cy="256" r="66" fill="currentColor" mask="url(#v2g-gleam)" />
+</svg>

@@ -59,6 +59,7 @@ Item {
 
           Text {
             text: root.item && root.item.name ? root.item.name : "System Action"
+            textFormat: Text.PlainText
             font.family: root.fontFamily
             font.pixelSize: Style.font.title
             font.bold: true
@@ -112,6 +113,7 @@ Item {
         Text {
           width: parent.width
           text: root.item && root.item.description ? root.item.description : ""
+          textFormat: Text.PlainText
           font.family: root.fontFamily
           font.pixelSize: Style.font.body
           color: root.foreground
@@ -147,6 +149,7 @@ Item {
         Text {
           width: parent.width
           text: root.item && root.item.detailText ? root.item.detailText : ""
+          textFormat: Text.PlainText
           font.family: root.fontFamily
           font.pixelSize: Style.font.caption
           color: root.foreground
@@ -176,6 +179,7 @@ Item {
 
             Text {
               text: root.item && root.item.command ? root.item.command : ""
+              textFormat: Text.PlainText
               font.family: Style.font.monoFamily || "monospace"
               font.pixelSize: Math.max(9, Style.font.caption - 1)
               color: root.foreground

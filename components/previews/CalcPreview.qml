@@ -70,6 +70,7 @@ Item {
 
           Text {
             text: root.item && root.item.category ? root.item.category.toUpperCase() : "CALCULATOR"
+            textFormat: Text.PlainText
             font.family: root.fontFamily
             font.pixelSize: Style.font.caption
             font.bold: true
@@ -88,6 +89,7 @@ Item {
               id: hitLabel
               anchors.centerIn: parent
               text: "INSTANT RESULT"
+              textFormat: Text.PlainText
               font.family: root.fontFamily
               font.pixelSize: Math.max(8, Style.font.caption - 2)
               font.bold: true
@@ -99,6 +101,7 @@ Item {
         Text {
           width: parent.width
           text: root.item && root.item.expression ? root.item.expression : ""
+          textFormat: Text.PlainText
           font.family: root.fontFamily
           font.pixelSize: Style.font.body
           color: root.foreground
@@ -134,6 +137,7 @@ Item {
         Text {
           anchors.horizontalCenter: parent.horizontalCenter
           text: root.item && root.item.expression ? (root.item.expression + " =") : ""
+          textFormat: Text.PlainText
           font.family: root.fontFamily
           font.pixelSize: Style.font.caption
           color: root.foreground
@@ -146,6 +150,7 @@ Item {
           anchors.horizontalCenter: parent.horizontalCenter
           width: parent.width
           text: root.item && root.item.name ? root.item.name : ""
+          textFormat: Text.PlainText
           font.family: root.fontFamily
           font.pixelSize: Style.space(30)
           font.bold: true
@@ -192,6 +197,7 @@ Item {
             Text {
               width: parent.width - Style.space(100) - parent.spacing
               text: root.item && root.item.details ? (root.item.details.raw || "") : ""
+              textFormat: Text.PlainText
               font.family: root.fontFamily
               font.pixelSize: Style.font.caption
               font.bold: true
@@ -215,6 +221,7 @@ Item {
             Text {
               width: parent.width - Style.space(100) - parent.spacing
               text: root.item && root.item.details ? (root.item.details.hex || "") : ""
+              textFormat: Text.PlainText
               font.family: root.fontFamily
               font.pixelSize: Style.font.caption
               color: root.accent
@@ -237,6 +244,7 @@ Item {
             Text {
               width: parent.width - Style.space(100) - parent.spacing
               text: root.item && root.item.details ? (root.item.details.binary || "") : ""
+              textFormat: Text.PlainText
               font.family: root.fontFamily
               font.pixelSize: Style.font.caption
               color: root.foreground
@@ -260,6 +268,7 @@ Item {
             Text {
               width: parent.width - Style.space(100) - parent.spacing
               text: root.item && root.item.details ? (root.item.details.scientific || "") : ""
+              textFormat: Text.PlainText
               font.family: root.fontFamily
               font.pixelSize: Style.font.caption
               color: root.foreground
@@ -289,6 +298,7 @@ Item {
             Text {
               width: parent.width - Style.space(100) - parent.spacing
               text: root.item && root.item.details ? (root.item.details.fromFormatted + " " + (root.item.details.fromName || root.item.details.fromUnit)) : ""
+              textFormat: Text.PlainText
               font.family: root.fontFamily
               font.pixelSize: Style.font.caption
               color: root.foreground
@@ -310,6 +320,7 @@ Item {
             Text {
               width: parent.width - Style.space(100) - parent.spacing
               text: root.item && root.item.details ? (root.item.details.toFormatted + " " + (root.item.details.toName || root.item.details.toUnit)) : ""
+              textFormat: Text.PlainText
               font.family: root.fontFamily
               font.pixelSize: Style.font.caption
               font.bold: true
@@ -333,6 +344,7 @@ Item {
             Text {
               width: parent.width - Style.space(100) - parent.spacing
               text: root.item && root.item.details ? root.item.details.rateText : ""
+              textFormat: Text.PlainText
               font.family: root.fontFamily
               font.pixelSize: Style.font.caption
               color: root.foreground

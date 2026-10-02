@@ -160,6 +160,7 @@ Item {
               id: idLabel
               anchors.centerIn: parent
               text: (root.item && root.item.appId ? root.item.appId : "") + ".desktop"
+              textFormat: Text.PlainText
               font.family: root.fontFamily
               font.pixelSize: Math.max(10, Style.font.caption)
               color: root.foreground

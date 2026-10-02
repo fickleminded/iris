@@ -180,7 +180,7 @@ describe("Omarchy System Commands & Actions (SystemProvider)", () => {
       const saverResults = SystemProvider.search("matrix", { themes: mockThemes });
       assert.ok(saverResults.length > 0);
       assert.strictEqual(saverResults[0].id, "sys-screensaver");
-      assert.strictEqual(saverResults[0].command, "omarchy screensaver");
+      assert.strictEqual(saverResults[0].command, "omarchy launch screensaver");
 
       const snapResults = SystemProvider.search("snapper", { themes: mockThemes });
       assert.ok(snapResults.length > 0);
