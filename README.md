@@ -12,6 +12,35 @@ Bringing the beloved Spotlight and Raycast overlay paradigm natively to Hyprland
 
 ---
 
+## 📥 Installation
+
+### Prerequisites
+Make sure you are running **Omarchy Quattro (Omarchy 4.0)** with **Quickshell** and **Hyprland**, along with the following standard utilities:
+- `fd` (for high-speed file search)
+- `wl-clipboard` (for clipboard operations)
+- `xdg-terminal-exec` or standard terminal emulator
+
+### 1. Install via Omarchy Plugin Manager
+Install and activate Iris directly using the Omarchy Quattro plugin manager:
+
+```bash
+omarchy plugin add https://github.com/fickleminded/iris.git --enable
+```
+
+### 2. Configure Global Shortcut
+Run the companion setup command to install the `iris` CLI binary, desktop launcher, and bind `ALT + SPACE` in Hyprland (`~/.config/hypr/bindings.lua`):
+
+```bash
+~/.config/omarchy/plugins/fickleminded.iris/bin/iris setup-keybind
+```
+
+> **Note:** By default, Iris binds to `ALT + SPACE` so your default Omarchy shortcuts (`SUPER + SPACE`) remain untouched. You can customize the shortcut during setup:
+> ```bash
+> ~/.config/omarchy/plugins/fickleminded.iris/bin/iris setup-keybind "SUPER + SPACE"
+> ```
+
+---
+
 ## ✨ Features & Capabilities
 
 - 🔍 **Adaptive Two-Pane Layout**:
@@ -67,35 +96,6 @@ Bringing the beloved Spotlight and Raycast overlay paradigm natively to Hyprland
 - 🎨 **Native Omarchy Theming**:
   - Inherits system theme tokens and accent colors automatically (`Color.menu.*`, `Style.*`).
   - Fullscreen Wayland dimming scrim with smooth opacity transitions.
-
----
-
-## 📥 Installation
-
-### Prerequisites
-Make sure you are running **Omarchy Quattro (Omarchy 4.0)** with **Quickshell** and **Hyprland**, along with the following standard utilities:
-- `fd` (for high-speed file search)
-- `wl-clipboard` (for clipboard operations)
-- `xdg-terminal-exec` or standard terminal emulator
-
-### 1. Install via Omarchy Plugin Manager
-Install and activate Iris directly using the Omarchy Quattro plugin manager:
-
-```bash
-omarchy plugin add https://github.com/fickleminded/iris.git --enable
-```
-
-### 2. Configure Global Shortcut
-Run the companion setup command to install the `iris` CLI binary, desktop launcher, and bind `ALT + SPACE` in Hyprland (`~/.config/hypr/bindings.lua`):
-
-```bash
-~/.config/omarchy/plugins/fickleminded.iris/bin/iris setup-keybind
-```
-
-> **Note:** By default, Iris binds to `ALT + SPACE` so your default Omarchy shortcuts (`SUPER + SPACE`) remain untouched. You can customize the shortcut during setup:
-> ```bash
-> ~/.config/omarchy/plugins/fickleminded.iris/bin/iris setup-keybind "SUPER + SPACE"
-> ```
 
 ---
 
