@@ -315,7 +315,26 @@ describe("Iris Web Provider & Bang Shortcuts (WebProvider)", () => {
   });
 
   describe("7. Browser Execution (openUrl)", () => {
-    test("executes browser launch command via quickshellUtil.execDetached", () => {
+    test("executes browser launch command via quickshellUtil.execArgv as literal argv array", () => {
+      const executedArgs = [];
+      const mockUtil = {
+        execArgv(argv) {
+          executedArgs.push(argv);
+          return true;
+        }
+      };
+
+      const testUrl = "https://wiki.archlinux.org/title/Hyprland";
+      WebProvider.openUrl(testUrl, mockUtil);
+
+      assert.strictEqual(executedArgs.length, 1);
+      assert.deepStrictEqual(Array.from(executedArgs[0]), [
+        "omarchy-launch-browser",
+        "https://wiki.archlinux.org/title/Hyprland"
+      ]);
+    });
+
+    test("falls back to execDetached with argv array when execArgv is not defined", () => {
       const executedCommands = [];
       const mockUtil = {
         execDetached(cmd) {
@@ -324,32 +343,32 @@ describe("Iris Web Provider & Bang Shortcuts (WebProvider)", () => {
         }
       };
 
-      const testUrl = "https://wiki.archlinux.org/title/Hyprland";
+      const testUrl = "https://archlinux.org";
       WebProvider.openUrl(testUrl, mockUtil);
 
       assert.strictEqual(executedCommands.length, 1);
-      assert.strictEqual(
-        executedCommands[0],
-        'omarchy-launch-browser "https://wiki.archlinux.org/title/Hyprland" || xdg-open "https://wiki.archlinux.org/title/Hyprland"'
-      );
+      assert.deepStrictEqual(Array.from(executedCommands[0]), [
+        "omarchy-launch-browser",
+        "https://archlinux.org"
+      ]);
     });
 
-    test("escapes double quotes safely in target URL", () => {
-      const executedCommands = [];
+    test("passes URLs with command injection characters as literal argv value without shell evaluation", () => {
+      const executedArgs = [];
       const mockUtil = {
-        execDetached(cmd) {
-          executedCommands.push(cmd);
+        execArgv(argv) {
+          executedArgs.push(argv);
         }
       };
 
-      const maliciousUrl = 'https://google.com/search?q="quotes"&test="123"';
+      const maliciousUrl = 'https://google.com/search?q="$(whoami)"&test=`id`;reboot';
       WebProvider.openUrl(maliciousUrl, mockUtil);
 
-      assert.strictEqual(executedCommands.length, 1);
-      assert.strictEqual(
-        executedCommands[0],
-        'omarchy-launch-browser "https://google.com/search?q=\\"quotes\\"&test=\\"123\\"" || xdg-open "https://google.com/search?q=\\"quotes\\"&test=\\"123\\""'
-      );
+      assert.strictEqual(executedArgs.length, 1);
+      assert.deepStrictEqual(Array.from(executedArgs[0]), [
+        "omarchy-launch-browser",
+        'https://google.com/search?q="$(whoami)"&test=`id`;reboot'
+      ]);
     });
 
     test("safely ignores execution on null, undefined, or empty URLs", () => {

@@ -34,8 +34,8 @@ describe("Iris Overlay Core Lifecycle & Adaptive Presentation", () => {
     test("first-time view presents discovery hints across core categories", () => {
       iris.open("{}");
 
-      // Exactly 6 discovery hints on empty launch (Apps, Files, Calc, AI, Web, System)
-      assert.strictEqual(iris.itemsList.length, 6);
+      // Exactly 7 discovery hints on empty launch (Apps, Files, Calc, AI, Web, Reminders, System)
+      assert.strictEqual(iris.itemsList.length, 7);
 
       const categories = Array.from(iris.itemsList.map(item => item.category));
       assert.deepStrictEqual(categories, [
@@ -44,6 +44,7 @@ describe("Iris Overlay Core Lifecycle & Adaptive Presentation", () => {
         "Calculator",
         "AI Agent",
         "Web Search",
+        "Reminders",
         "System Actions"
       ]);
 
@@ -69,8 +70,8 @@ describe("Iris Overlay Core Lifecycle & Adaptive Presentation", () => {
       assert.strictEqual(iris.selectedIndex, 1);
       assert.strictEqual(iris.selectedItem.id, "hint-files");
 
-      iris.select(4);
-      assert.strictEqual(iris.selectedIndex, 5);
+      iris.select(5);
+      assert.strictEqual(iris.selectedIndex, 6);
       assert.strictEqual(iris.selectedItem.id, "hint-system");
 
       // Wrap around to top
@@ -79,7 +80,7 @@ describe("Iris Overlay Core Lifecycle & Adaptive Presentation", () => {
 
       // Wrap around backwards to bottom
       iris.select(-1);
-      assert.strictEqual(iris.selectedIndex, 5);
+      assert.strictEqual(iris.selectedIndex, 6);
     });
 
     test("activating a hint populates actionable query template", () => {

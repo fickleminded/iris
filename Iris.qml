@@ -152,6 +152,36 @@ Item {
     themeListProcess.running = true
   }
 
+  property var activeRemindersData: null
+
+  Process {
+    id: reminderProcess
+    command: ["omarchy", "reminder", "show", "--json"]
+    stdout: StdioCollector {
+      waitForEnd: true
+      onStreamFinished: {
+        var raw = String(text || "").trim()
+        if (raw.length > 0) {
+          try {
+            root.activeRemindersData = JSON.parse(raw)
+          } catch (e) {
+            root.activeRemindersData = null
+          }
+        } else {
+          root.activeRemindersData = null
+        }
+        root.refreshQuery()
+      }
+    }
+  }
+
+  function fetchActiveReminders() {
+    if (!reminderProcess.running) {
+      reminderProcess.command = ["omarchy", "reminder", "show", "--json"]
+      reminderProcess.running = true
+    }
+  }
+
   function pasteFromClipboard() {
     pasteProcess.command = root.pasteCommand
     pasteProcess.running = true
@@ -298,7 +328,8 @@ Item {
       themes: root.installedThemes,
       shell: root.shell,
       resolveIcon: root.resolveIcon,
-      defaultAgent: root.defaultAgent
+      defaultAgent: root.defaultAgent,
+      activeRemindersData: root.activeRemindersData
     }
     root.itemsList = Engine.search(root.filterText, ctx)
     if (root.selectedIndex >= root.itemsList.length) {
@@ -328,12 +359,17 @@ Item {
       root.aiResponseText = ""
       root.aiErrorText = ""
     }
+
+    if (Engine.parseReminderQuery(root.filterText)) {
+      root.fetchActiveReminders()
+    }
   }
   onDesktopApplicationsChanged: root.refreshQuery()
   onOpenedChanged: {
     if (root.opened) {
       root.pickRandomPlaceholder()
       root.reloadThemes()
+      root.fetchActiveReminders()
       Qt.callLater(function() { keyCatcher.forceActiveFocus() })
     }
   }
@@ -418,6 +454,8 @@ Item {
       Engine.openWebUrl(item, Util)
     } else if (item.kind === "ai" || item.kind === "ai-setup") {
       Engine.launchAi(item, Util)
+    } else if (item.kind === "reminder-set" || item.kind === "reminder-clear" || item.kind === "reminder-interactive" || item.kind === "reminder-active") {
+      Engine.executeReminderAction(item, Util)
     }
     root.dismiss()
   }
@@ -527,6 +565,12 @@ Item {
               Engine.copyCalcResult(root.selectedItem, Util)
             } else if (root.selectedItem && (root.selectedItem.kind === "ai" || root.selectedItem.kind === "ai-setup")) {
               Engine.copyAiResponse(root.aiResponseText, Util)
+            }
+            event.accepted = true
+          } else if ((event.modifiers & Qt.AltModifier) && event.key === Qt.Key_C) {
+            if (root.selectedItem && (root.selectedItem.kind === "reminder-active" || root.selectedItem.kind === "reminder-clear")) {
+              Engine.executeReminderAction({ kind: "reminder-clear" }, Util)
+              root.dismiss()
             }
             event.accepted = true
           } else if (((event.modifiers & Qt.ControlModifier) && (event.key === Qt.Key_V || event.text === "v" || event.text === "V" || event.text === "\u0016")) ||
@@ -989,9 +1033,31 @@ Item {
                 onCancelRequested: root.cancelAiQuery()
               }
 
-              // 7. Generic / Demo Preview Fallback
+              // 7. Reminders & Timers Preview (Phase 8)
+              Previews.ReminderPreview {
+                visible: Boolean(root.selectedItem && root.selectedItem.previewType === "reminder")
+                anchors.fill: parent
+                item: root.selectedItem
+                fontFamily: root.fontFamily
+                foreground: root.foreground
+                accent: root.accent
+                border: root.border
+                cornerRadius: root.cornerRadius
+                onSetRequested: root.activateItem(root.selectedItem)
+                onClearRequested: {
+                  Engine.executeReminderAction({ kind: "reminder-clear" }, Util)
+                  root.dismiss()
+                }
+                onInteractiveRequested: {
+                  Engine.executeReminderAction({ kind: "reminder-interactive" }, Util)
+                  root.dismiss()
+                }
+                onDismissRequested: root.dismiss()
+              }
+
+              // 8. Generic / Demo Preview Fallback
               Column {
-                visible: Boolean(!root.selectedItem || (root.selectedItem.previewType !== "app" && root.selectedItem.previewType !== "file" && root.selectedItem.previewType !== "calc" && root.selectedItem.previewType !== "system" && root.selectedItem.previewType !== "web" && root.selectedItem.previewType !== "ai"))
+                visible: Boolean(!root.selectedItem || (root.selectedItem.previewType !== "app" && root.selectedItem.previewType !== "file" && root.selectedItem.previewType !== "calc" && root.selectedItem.previewType !== "system" && root.selectedItem.previewType !== "web" && root.selectedItem.previewType !== "ai" && root.selectedItem.previewType !== "reminder"))
                 anchors.fill: parent
                 anchors.margins: Style.spacing.sm
                 spacing: Style.spacing.sm

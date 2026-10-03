@@ -35,6 +35,7 @@ function createIrisEngine() {
   const SystemProvider = loadQmlJs("js/Providers/SystemProvider.js");
   const WebProvider = loadQmlJs("js/Providers/WebProvider.js");
   const AiProvider = loadQmlJs("js/Providers/AiProvider.js");
+  const ReminderProvider = loadQmlJs("js/Providers/ReminderProvider.js");
 
   const Engine = loadQmlJs("js/IrisEngine.js", {
     AppProvider,
@@ -42,10 +43,11 @@ function createIrisEngine() {
     CalcProvider,
     SystemProvider,
     WebProvider,
-    AiProvider
+    AiProvider,
+    ReminderProvider
   });
 
-  return { Engine, AppProvider, FileProvider, CalcProvider, SystemProvider, WebProvider, AiProvider };
+  return { Engine, AppProvider, FileProvider, CalcProvider, SystemProvider, WebProvider, AiProvider, ReminderProvider };
 }
 
 // Models the state and lifecycle of Iris.qml
@@ -96,6 +98,10 @@ function createIrisOverlayState(options = {}) {
       },
       execDetached(cmd) {
         state.launchedCommands.push(cmd);
+        return true;
+      },
+      execArgv(argv) {
+        state.launchedCommands.push(argv);
         return true;
       }
     },
@@ -254,6 +260,8 @@ function createIrisOverlayState(options = {}) {
         Engine.openWebUrl(item, state.quickshellUtil);
       } else if (item.kind === "ai" || item.kind === "ai-setup") {
         Engine.launchAi(item, state.quickshellUtil);
+      } else if (item.kind === "reminder-set" || item.kind === "reminder-clear" || item.kind === "reminder-interactive" || item.kind === "reminder-active") {
+        Engine.executeReminderAction(item, state.quickshellUtil);
       }
       state.dismiss();
     },

@@ -93,6 +93,14 @@ Run the companion setup command to install the `iris` CLI binary, desktop launch
   - Press `Ctrl+C` or `Ctrl+Y` to copy the generated markdown response to the clipboard.
   - Zero-config onboarding: If no default agent is selected, pressing `Enter` summons the native agent picker.
 
+- ⏰ **Omarchy Reminders & Countdown Timers**:
+  - Natural language scheduling: `remind me in 10m check oven`, `remind 15 call mom`, `remind in 1h take a break`.
+  - Focused timers: `timer 25m Pomodoro`, `timer 10`, `alarm 15m Tea`.
+  - Automatic duration normalization for raw integers, minutes (`15m`), hours (`1h`, `1.5h`), and compound times (`1h30m`).
+  - Active timers inspection: Type `reminders` or `timers` to view live countdowns and fire times.
+  - One-click cancellation: `clear reminders` or press `Alt + C` to stop all active timers.
+  - Deep system integration via Omarchy's native systemd user timer CLI (`omarchy reminder`).
+
 - 🎨 **Native Omarchy Theming**:
   - Inherits system theme tokens and accent colors automatically (`Color.menu.*`, `Style.*`).
   - Fullscreen Wayland dimming scrim with smooth opacity transitions.
@@ -118,6 +126,8 @@ omarchy plugin remove fickleminded.iris
 | `↑` / `↓` | Results List | Navigate search results |
 | `Enter` | Any Result | Execute primary action (Launch app, open file, copy result) |
 | `Enter` | AI Prompt | Hand off session to interactive terminal (`omarchy agent prompt`) |
+| `Enter` | Reminder / Timer | Set reminder or start countdown timer (`omarchy reminder`) |
+| `Alt + C` | Reminder Result | Clear all active reminder timers (`omarchy reminder clear`) |
 | `Tab` / `Ctrl + O` | File Result | Reveal and select in File Manager (`nautilus`) |
 | `Ctrl + T` | File Result | Open containing folder in Terminal |
 | `Ctrl + C` / `Ctrl + Y` | File / Calc / AI | Copy path, calc result, or streamed AI answer to clipboard |
@@ -137,6 +147,8 @@ iris toggle
 # Open Iris directly with a prefilled query
 iris open "calc 128 * 4"
 iris open "!gh omarchy"
+iris open "timer 25m Pomodoro"
+iris open "reminders"
 
 # Close the overlay
 iris close
@@ -168,7 +180,7 @@ To run the automated test suite locally:
 ## 🔮 Roadmap & Future Improvements
 
 - [x] 🤖 **AI Prompt with Default Agent**: Inline AI queries (ai <prompt> or ? <prompt>) that pipe directly to the configured Omarchy default AI agent with instant previews.
-- [ ] ⏰ **Omarchy Reminders & Timers**: Natural language quick reminders (e.g., `remind in 15m review PR`, `timer 5m`) integrated with desktop notifications.
+- [x] ⏰ **Omarchy Reminders & Timers**: Natural language quick reminders (e.g., `remind in 15m review PR`, `timer 25m`) integrated with desktop notifications.
 - [ ] 🧩 **Plugin Management Shortcuts**: Quick lookup, inspection, and toggling of Omarchy plugins (`plugin list`, `plugin enable <name>`, `plugin update`).
 - [ ] 📦 **Package Search & Installation**: Fast Arch Linux (`pacman`) and AUR package search with one-click terminal install triggers (`install <package>`, `pkg <query>`).
 - [ ] 📋 **Clipboard History Search**: Searchable clipboard history with previews, quick paste, and sensitive token masking.

@@ -5,11 +5,12 @@
 .import "Providers/SystemProvider.js" as SystemProvider
 .import "Providers/WebProvider.js" as WebProvider
 .import "Providers/AiProvider.js" as AiProvider
+.import "Providers/ReminderProvider.js" as ReminderProvider
 
 // Iris Engine: Central dispatcher and provider coordinator
-// Coordinates AppProvider, FileProvider, CalcProvider, SystemProvider, WebProvider, and AiProvider.
+// Coordinates AppProvider, FileProvider, CalcProvider, SystemProvider, WebProvider, AiProvider, and ReminderProvider.
 
-var VERSION = "1.3.1";
+var VERSION = "1.4.1";
 var MAX_RESULTS = 50;
 
 // Format byte sizes into human readable strings (B, KB, MB, GB)
@@ -99,6 +100,17 @@ function search(text, context) {
         fillQuery: "!g "
       },
       {
+        id: "hint-reminder",
+        kind: "hint",
+        category: "Reminders",
+        name: "Timers & Reminders",
+        description: "Schedule reminders or countdowns: 'remind 10m check oven' or 'timer 25m'",
+        icon: "󰢌",
+        hasPreview: false,
+        action: "hint",
+        fillQuery: "remind 10m "
+      },
+      {
         id: "hint-system",
         kind: "hint",
         category: "System Actions",
@@ -131,6 +143,16 @@ function search(text, context) {
     if (hasWebTopHit) {
       for (var w = 0; w < webMatches.length; w++) {
         results.push(webMatches[w]);
+      }
+      return results;
+    }
+
+    // 2b. Reminders & Countdown Timers (e.g. remind 10m, timer 25m, reminders, clear reminders)
+    var reminderMatches = ReminderProvider.search(q, context && context.activeRemindersData);
+    var hasReminderTopHit = !calcHit && reminderMatches.length > 0 && reminderMatches[0].isTopHit === true;
+    if (hasReminderTopHit) {
+      for (var r = 0; r < reminderMatches.length; r++) {
+        results.push(reminderMatches[r]);
       }
       return results;
     }
@@ -241,6 +263,14 @@ function parseAiQuery(query) {
 
 function buildAiInlineArgs(prompt) {
   return AiProvider.buildInlineArgs(prompt);
+}
+
+function executeReminderAction(item, quickshellUtil) {
+  return ReminderProvider.execute(item, quickshellUtil);
+}
+
+function parseReminderQuery(query) {
+  return ReminderProvider.parseReminderQuery(query);
 }
 
 

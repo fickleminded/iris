@@ -212,12 +212,18 @@ function search(rawInput) {
   return results;
 }
 
-// Open target URL in the user's default browser via Omarchy launcher or xdg-open
+// Open target URL in the user's default browser via Omarchy launcher
+// Passes the target URL as a literal argv argument to avoid shell parsing or command execution from URLs
 function openUrl(url, quickshellUtil) {
-  if (!url) return;
-  var safeUrl = url.replace(/"/g, '\\"');
-  var cmd = 'omarchy-launch-browser "' + safeUrl + '" || xdg-open "' + safeUrl + '"';
-  if (quickshellUtil && typeof quickshellUtil.execDetached === "function") {
-    quickshellUtil.execDetached(cmd);
+  if (!url || typeof url !== "string") return;
+  var targetUrl = url.trim();
+  if (targetUrl.length === 0) return;
+
+  var argv = ["omarchy-launch-browser", targetUrl];
+
+  if (quickshellUtil && typeof quickshellUtil.execArgv === "function") {
+    quickshellUtil.execArgv(argv);
+  } else if (quickshellUtil && typeof quickshellUtil.execDetached === "function") {
+    quickshellUtil.execDetached(argv);
   }
 }
